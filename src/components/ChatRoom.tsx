@@ -69,7 +69,7 @@ export const ChatRoom = ({ chatId, onBack }: { chatId: string; onBack: () => voi
   };
 
   return (
-    <div className="flex flex-col h-full bg-zinc-900/50 rounded-3xl overflow-hidden border border-white/5 relative">
+    <div className="flex flex-col h-full bg-zinc-900/50 rounded-3xl overflow-hidden border border-white/5 relative max-w-2xl mx-auto">
       {/* Header */}
       <div className="p-4 flex items-center gap-3 border-bottom border-white/5 bg-white/5">
         <button onClick={onBack} className="p-2 hover:bg-white/5 rounded-full text-zinc-400">

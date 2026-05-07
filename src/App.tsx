@@ -57,16 +57,16 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen max-w-md mx-auto relative flex flex-col pt-6 pb-24 px-4 bg-transparent overflow-hidden">
+    <div className="min-h-screen relative flex flex-col pt-6 pb-24 px-4 bg-transparent overflow-hidden">
       <div className="atmosphere-bg" />
-      <header className="flex justify-between items-center mb-8 px-2">
+      <header className="max-w-7xl mx-auto w-full flex justify-between items-center mb-8 px-2">
         <div>
-          <h1 className="text-3xl font-serif font-bold tracking-tight text-white">SONHAR</h1>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-dream-purple font-semibold">Conectando Almas Visionárias</p>
+          <h1 className="text-3xl lg:text-4xl font-serif font-bold tracking-tight text-white">SONHAR</h1>
+          <p className="text-[10px] lg:text-xs uppercase tracking-[0.2em] text-dream-purple font-semibold">Conectando Almas Visionárias</p>
         </div>
       </header>
 
-      <main className="flex-1 overflow-hidden relative">
+      <main className="flex-1 max-w-7xl mx-auto w-full overflow-hidden relative">
         {renderContent()}
       </main>
 

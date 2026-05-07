@@ -102,7 +102,7 @@ export const MainFeed = () => {
           animate={{ scale: 1, opacity: 1, rotate: 0 }}
           exit={{ x: 300, opacity: 0, rotate: 10 }}
           transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-          className="w-full h-full glass-card rounded-[2.5rem] overflow-hidden flex flex-col relative"
+          className="w-full max-w-sm h-full glass-card rounded-[2.5rem] overflow-hidden flex flex-col relative"
         >
           {/* Cover Image / Profile Pic */}
           <div className="h-[60%] w-full relative">

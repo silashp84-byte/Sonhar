@@ -103,7 +103,7 @@ export const FriendsList = ({ onOpenChat }: { onOpenChat: (id: string) => void }
             <p className="text-sm font-light italic">Suas parcerias surgirão aqui assim que aceitas.</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {accepted.map(f => {
               const otherId = f.userIds.find(id => id !== user?.uid);
               const data = otherId ? friendData[otherId] : null;

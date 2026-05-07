@@ -11,7 +11,7 @@ export const ProfileView = () => {
   if (!profile) return null;
 
   return (
-    <div className="h-full w-full overflow-y-auto space-y-6 pb-20">
+    <div className="h-full w-full overflow-y-auto space-y-6 pb-20 max-w-2xl mx-auto">
       {/* Header Profile */}
       <div className="flex flex-col items-center text-center pt-4">
         <div className="relative mb-4 group">
