@@ -1,0 +1,85 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Globals
+    function isSignedIn() { return request.auth != null; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+
+    // User Profile Validation
+    function isValidUser(data) {
+      return data.displayName is string && data.displayName.size() >= 2 && data.displayName.size() <= 100
+        && data.dreamGoal is string && data.dreamGoal.size() <= 500
+        && (data.get('bio', '') is string && data.get('bio', '').size() <= 1000)
+        && (data.get('photoURL', '') is string && data.get('photoURL', '').size() <= 2048)
+        && (data.get('location', '') is string && data.get('location', '').size() <= 200);
+    }
+
+    match /users/{userId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn(); // Basic profiles are public in this app
+      allow create: if isOwner(userId) && isValidUser(incoming())
+        && incoming().createdAt == request.time;
+      allow update: if isOwner(userId) && isValidUser(incoming())
+        && incoming().createdAt == existing().createdAt
+        && (incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'bio', 'photoURL', 'dreamGoal', 'location', 'lastSeen']));
+    }
+
+    // Dream Validation
+    function isValidDream(data) {
+      return data.userId == request.auth.uid
+        && data.title is string && data.title.size() >= 3 && data.title.size() <= 200
+        && data.description is string && data.description.size() <= 5000
+        && (data.get('category', '') is string && data.get('category', '').size() <= 100)
+        && (data.get('tags', []).size() <= 10);
+    }
+
+    match /dreams/{dreamId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidDream(incoming())
+        && incoming().createdAt == request.time;
+      allow update: if isOwner(existing().userId) && isValidDream(incoming())
+        && incoming().createdAt == existing().createdAt
+        && (incoming().diff(existing()).affectedKeys().hasOnly(['title', 'description', 'category', 'tags', 'imageUrl', 'status']));
+      allow delete: if isOwner(existing().userId);
+    }
+
+    // Friendship Validation
+    function isValidFriendship(data) {
+      return data.userIds is list && data.userIds.size() == 2
+        && data.userIds.hasAll([request.auth.uid])
+        && data.userIds[0] != data.userIds[1]
+        && data.status in ['pending', 'accepted']
+        && data.requestedBy == request.auth.uid;
+    }
+
+    match /friendships/{friendshipId} {
+      allow read: if isSignedIn() && request.auth.uid in existing().userIds;
+      allow create: if isSignedIn() && isValidFriendship(incoming())
+        && incoming().status == 'pending'
+        && incoming().createdAt == request.time;
+      allow update: if isSignedIn() && request.auth.uid in existing().userIds
+        && (
+          // Case 1: Accepting request
+          (existing().status == 'pending' && incoming().status == 'accepted' && request.auth.uid != existing().requestedBy && incoming().diff(existing()).affectedKeys().hasOnly(['status']))
+        );
+      allow delete: if isSignedIn() && request.auth.uid in existing().userIds;
+
+      match /messages/{messageId} {
+        allow read: if isSignedIn() && request.auth.uid in get(/databases/$(database)/documents/friendships/$(friendshipId)).data.userIds;
+        allow create: if isSignedIn() && request.auth.uid in get(/databases/$(database)/documents/friendships/$(friendshipId)).data.userIds
+          && incoming().senderId == request.auth.uid
+          && incoming().chatId == friendshipId
+          && incoming().text is string && incoming().text.size() <= 5000
+          && incoming().createdAt == request.time;
+      }
+    }
+  }
+}

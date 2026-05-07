@@ -1,0 +1,77 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Public and private user profile information.",
+      "type": "object",
+      "properties": {
+        "displayName": { "type": "string", "description": "User's full name or nickname." },
+        "bio": { "type": "string", "description": "User's short biography." },
+        "photoURL": { "type": "string", "format": "uri", "description": "Profile picture URL." },
+        "dreamGoal": { "type": "string", "description": "The user's primary life goal or dream." },
+        "location": { "type": "string", "description": "User's general location (city/country)." },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "lastSeen": { "type": "string", "format": "date-time" }
+      },
+      "required": ["displayName", "dreamGoal"]
+    },
+    "Dream": {
+      "title": "User Dream",
+      "description": "A specific dream or objective shared by a user.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "ID of the user who owns this dream." },
+        "title": { "type": "string", "description": "Title of the dream." },
+        "description": { "type": "string", "description": "Detailed description of the goal." },
+        "category": { "type": "string", "description": "Category like Career, Travel, Health, etc." },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "imageUrl": { "type": "string", "format": "uri" },
+        "status": { "type": "string", "enum": ["active", "achieved"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "title", "description"]
+    },
+    "Friendship": {
+      "title": "Friendship",
+      "description": "A connection between two users.",
+      "type": "object",
+      "properties": {
+        "userIds": { "type": "array", "items": { "type": "string" }, "description": "The two user IDs in the friendship." },
+        "status": { "type": "string", "enum": ["pending", "accepted"] },
+        "requestedBy": { "type": "string", "description": "The user ID who sent the request." },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userIds", "status", "requestedBy"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "A chat message between friends.",
+      "type": "object",
+      "properties": {
+        "chatId": { "type": "string", "description": "ID of the chat/friendship." },
+        "senderId": { "type": "string", "description": "ID of the sender." },
+        "text": { "type": "string", "description": "Message content." },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["chatId", "senderId", "text"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "User",
+      "description": "User profile document."
+    },
+    "dreams/{dreamId}": {
+      "schema": "Dream",
+      "description": "Dream shared by a user."
+    },
+    "friendships/{friendshipId}": {
+      "schema": "Friendship",
+      "description": "Friendship or friend request."
+    },
+    "friendships/{friendshipId}/messages/{messageId}": {
+      "schema": "Message",
+      "description": "Messages within a friendship chat."
+    }
+  }
+}
